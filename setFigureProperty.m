@@ -22,9 +22,9 @@ function handle = setFigureProperty(varargin)
 % by Yuting Chen
 %  Imperial College London
 
-set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+set(0,'defaultAxesFontSize',12,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
 if nargin == 0
-    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+    set(0,'defaultAxesFontSize',12,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
     XYWH = [150,150,250,180];
     set(gcf,'units','points','position',XYWH);
 else

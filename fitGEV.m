@@ -25,13 +25,14 @@ p.addOptional('method','Gringorten');
 p.addOptional('dataPlot',0);
 p.addOptional('returnPeriod',20);
 p.addOptional('colorI',[0.9,0.9,0.9]);
+p.addOptional('masize',4);
 p.parse(varargin{:});
 % shorthen the variables name
 method = p.Results.method ;
 dataPlot = p.Results.dataPlot ;
 returnPeriod = p.Results.returnPeriod;
 colorI = p.Results.colorI;
-
+masize = p.Results.masize;
 switch method,
     case 'moments'
         parmhat(1) = 0; % Assume Gumbel distribution
@@ -59,10 +60,10 @@ if dataPlot ==1,
     
     % figure
     hold on;box on;
-    hobs = plot(r,sort(y),'ko','markerfacecolor',colorI); % cdf of y
+    hobs = plot(r,sort(y),'ko','markerfacecolor',colorI,'markersize',masize); % cdf of y
     hfit = plot(R(1,:),X,'color',colorI);
     xlabel('Return period (years)');
-    ylabel('wind velocity (m/s)');
+    ylabel('Maximum Depth (mm/[*SCALE?*])');
     ylim([0.9*min(X(R<returnPeriod)),1.1*max(X(R<returnPeriod))])
     xlim([0,returnPeriod])
     legend('Measured','fitted', 'location','SouthEast')
@@ -70,7 +71,7 @@ if dataPlot ==1,
     set(gcf,'color','w')
     % return period-rain
     [~,ind_R] = min(abs(R(1,:)-returnPeriod ));
-    fprintf([num2str(round(x(end))),'-year AM is ',num2str(X(ind_R),3),' m/s (based on ',num2str(nanmax(date)-nanmin(date)),' years of data) \n'])
+    % fprintf([num2str(round(x(end))),'-year AM is ',num2str(X(ind_R),3),' m/s (based on ',num2str(nanmax(date)-nanmin(date)),' years of data) \n'])
 else
     [hobs,hfit] = deal([]);
 end

@@ -32,9 +32,14 @@ if ~isempty(p.Results.Cat)
     load(p.Results.Cat,'catBound','xyMat');
     in = inpolygon(xyMat.xx,xyMat.yy,catBound.x,catBound.y);
     Z(~in) = NaN;
+    
+    % correct those parts
+    Z(in(isnan(Z(in)))) = nanmean(Z(in));
     imAlpha = ones(size(Z));
+    
     imAlpha(isnan(Z)) = 0;
     imagesc(xyMat.x_yr,xyMat.y_yr,Z,'AlphaData',imAlpha);
+    
 else
     imAlpha = ones(size(Z));
     imAlpha(isnan(Z)) = 0;
@@ -44,9 +49,9 @@ set(gca,'YDir','normal')
 hold on;
 
 if ~isempty(p.Results.Cat)
-    plot(catBound.x,catBound.y,'k-');
-    hold on;
-    plot(catBound.SN.x,catBound.SN.y,'.','markersize',2,'color',[0.2 0.2 0.2]);
+    % plot(catBound.x,catBound.y,'-','color',[0.5 0.5 0.5]);
+    % hold on;
+    plot(catBound.SN.x,catBound.SN.y,'.','markersize',2,'color',[0.9 0.9 0.9]);
     hold on;
 end
 
@@ -64,7 +69,6 @@ axis tight
 axis equal
 
 
-
 if ~isempty(p.Results.caxis)
     caxis(p.Results.caxis)
 end
@@ -72,6 +76,5 @@ end
 if ~isempty(p.Results.title)
     title(p.Results.title)
 end
-
 
 end
