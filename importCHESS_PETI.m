@@ -57,7 +57,7 @@ auxTag = 1;
 try
     for year = YEAR
         for mon = 1:12
-            source = ['C:\Users\Yuting Chen\Box\CHESS_PETI\chess_peti_wwg_',num2str(year),sprintf('%02d', mon),'.nc'];
+            source = ['K:\CHESS_PETI\chess_peti_wwg_',num2str(year),sprintf('%02d', mon),'.nc'];
             % finfo = ncinfo(source);
             peti = ncread(source,'peti');
             x = ncread(source,'x');

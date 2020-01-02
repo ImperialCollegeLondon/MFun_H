@@ -29,7 +29,25 @@ function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor,Y_coor,date0,pl)
 %
 % Output: monthly spatial pattern of rainfall pattern. 
 % RAIN: UNIT: rainfall amount / 365 day
-%        
+%     
+%
+% %%
+% YEARRANGE = [2011:2015];
+% options = weboptions('username','yutingchen0604@hotmail.com','password','AaBb14207','Timeout',Inf);
+% weblink = 'https://catalogue.ceh.ac.uk/datastore/eidchub/ee9ab43d-a4fe-4e73-afd5-cd4fc4c82556/GB/daily/';
+% for year = YEARRANGE
+%     
+%     try
+%         OFN = websave(['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'],...
+%             [weblink,'CEH_GEAR_daily_GB_',num2str(year),'.nc'],options);
+%         disp(['Finished:',num2str(year)]);
+%     catch
+%         disp('111');
+%     end
+% 
+% end
+%
+%
 %% save it in different year and different month;
 
 % CHECK no estimate: -2
@@ -45,8 +63,8 @@ end
 dayi = -datenum(datetime(year,1,1,0,0,0))+date0+1;
 
 try
-    
-    source = ['D:\CEH_GEAR_Daily\CEH_GEAR_daily_GB_',num2str(year),'.nc'];
+    %D:\CEH_GEAR_Daily
+    source = ['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'];
     finfo = ncinfo(source);
     
     varname = 'rainfall_amount';

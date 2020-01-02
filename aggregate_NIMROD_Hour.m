@@ -27,7 +27,7 @@ function [status] = aggregate_NIMROD_Hour(YEAR,varargin)
 
 status = 0;
 commandwindow
-rp = 'H:\DATA_RADAR\UK_Radar_Matlab\';
+rp = 'F:\NIMROD_Radar_2\';%'H:\DATA_RADAR\UK_Radar_Matlab\';
 fprintf('Now the file path is: %s\n',rp);
 
 
@@ -61,7 +61,8 @@ tic
 totalDays = datenum(endD)-datenum(startD);
 
 % PRS = NaN(2175,1725,12*(totalDays+1),'single');
-fid = fopen(['Year',num2str(YEAR),'_dialogFile.txt'],'w');
+fid = fopen(['H:\CODE_MATLAB\SpatialTemporalDATA\RadarDialogFile\',...
+    'Year',num2str(YEAR),'_dialogFile.txt'],'w');
 
 for ind_day = 0:totalDays
     tic
@@ -85,7 +86,15 @@ for ind_day = 0:totalDays
             x0 = aaa.rl_gen_hd(5);
             y0 = aaa.rl_gen_hd(3);
             if sum(size(aaa.rr)==[c1,c2])==2
-                PRS0(:,minu) = reshape(aaa.rr,[],1);
+                minuind = round(datenum(datetime(times{minu}(2:end),...
+                    'format','yyyyMMddHHmm')-datetime(times{minu}(2:end-4),...
+                    'format','yyyyMMdd'))*24*12)+1;
+                try
+                    PRS0(:,minuind) = reshape(aaa.rr,[],1);
+                catch
+                    1;
+                end
+                % fprintf('%03d\n',minuind);
             else
                 fprintf(fid,'%s\n',times{minu});
             end
@@ -97,8 +106,14 @@ for ind_day = 0:totalDays
     disp(['Iter: Day:',num2str(ind_day)]);
     clear DAT
     
-    % aggregate to hourly scale.
-    PRS0 = int16(imresize(PRS0,'Scale',[1,1/12]));%[c1 c2 24]));
+    % aggregate to hourly scale.also use a data struct of int16 (sf:32)
+    
+    % Use this! accurate and effecient!
+    PRS0 = int16(1/12*double(squeeze(nansum(reshape(PRS0,size(PRS0,1),12,[]),2))));
+    
+    % time consuming below, and not an accurate aggregate.
+    % PRS0 = int16(imresize(PRS0,'Scale',[1,1/12]));%[c1 c2 24]));
+    
     save(['H:\DATA_RADAR\UK_Radar_HourlyAggregate\',filename],'PRS0');
     PRS0 = 0;
     toc

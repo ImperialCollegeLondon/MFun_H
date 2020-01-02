@@ -57,7 +57,8 @@ auxTag = 1;
 try
     for year = YEAR
         for mon = 1:12
-            source = ['C:\Users\Yuting Chen\Box\CHESS_PET\chess_pet_wwg_',num2str(year),sprintf('%02d', mon),'.nc'];
+            %C:\Users\Yuting Chen\Box
+            source = ['K:\CHESS_PET\chess_pet_wwg_',num2str(year),sprintf('%02d', mon),'.nc'];
             % finfo = ncinfo(source);
             pet = ncread(source,'pet');
             x = ncread(source,'x');
@@ -66,7 +67,7 @@ try
                 for pj = 1:size(XX,2)
                     ix = findSDi(x,XX(pi,pj));
                     iy = findSDi(y,YY(pi,pj));
-                    petAux = squeeze(mean(mean(pet(ix,iy,:),1),2));
+                    petAux = squeeze(pet(ix(1),iy(1),:));
                     PETGroup(pi,pj,(auxTag:auxTag+eomday(year,mon)-1)) = petAux;
                 end
             end
@@ -80,3 +81,6 @@ end
 fprintf('importCHESS_PET finished.\n');
 
 end
+
+
+

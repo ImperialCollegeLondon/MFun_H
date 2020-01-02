@@ -36,7 +36,7 @@ function [PRS,status] = importNIMROD_P(XX,YY,YEARRANGE,varargin)
 
 
 status = 0;
-rp = 'E:\UK_Radar_2007_2008\';
+rp = 'H:\DATA_RADAR\UK_Radar_Matlab\';
 commandwindow
 fprintf('Now the file path is: %s\n',rp);
 
@@ -116,11 +116,11 @@ for ind_day = 0:totalDays
             rain = NaN(size(XX,1),size(XX,2),'single');
             PRS(:,:,ind_day*24*12 + minu) = rain;
             nan_day = nan_day + 1;
-            disp([times{minu},' nan+1-->',num2str(nan_day)]);
+            % disp([times{minu},' nan+1-->',num2str(nan_day)]);
         end
     end
-    disp(['Iter: Day:',num2str(ind_day)]);
-    toc
+    disp(['Iter: Day:\n',num2str(ind_day)]);
+    % toc
 %     image(double(aaa.rr));hold on;
 %     %contourf(sei,sej,RR(unique(sei),unique(sej)),'r.');hold on;
 %     plot(sej(:),sei(:),'r.');

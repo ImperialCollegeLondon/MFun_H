@@ -1,7 +1,5 @@
 function out=aggregate(data,scale,method)
 
-
-
 if scale==1
     out=data;
 else
