@@ -11,7 +11,7 @@ itag = 1;
 for dt = 1%24%[1,24]%[24]
     figure;
     setFigureProperty;
-    disFlow = 0.01;%0.1;%0.5;%0.5;%0.5;%1.2;%1;%0.2*24;
+    disFlow = 0.2;
     
     method = {'GEAR'};%'GEAR'{'BK'};%{'CKED'};
     xx = [0.001:0.001:100];%[0.001:0.001:100];
