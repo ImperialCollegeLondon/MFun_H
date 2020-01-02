@@ -51,17 +51,16 @@ for year_aux = YEARRANGE
     PET = [];
     
     if isempty(varargin)
-        % Corrected_radar using GEAR (daily)-2020: this one.
-        RADAR_aux = load([FILEPATH,'\DATA_INPUT\',CatchName,'_PRSRADAR_DGEAR_DATA_',...
-            num2str(cellsize),'m_',num2str(year_aux),'.mat'],'Prs_radar');
-        Prs_spatial = cat(3,Prs_spatial,RADAR_aux.Prs_radar);
         
         % Corrected_radar using CATRAIN (Annual based)
         % RADAR_aux = load([FILEPATH,'\DATA_INPUT\',CatchName,'_PRSRADAR_DATA_',...
         %    num2str(cellsize),'m_',num2str(year_aux),'.mat']);
         % Prs_spatial = cat(3,Prs_spatial,RADAR_aux.Prs_radar);
         
-
+        % Corrected_radar using GEAR (daily)
+        RADAR_aux = load([FILEPATH,'\DATA_INPUT\',CatchName,'_PRSRADAR_DGEAR_DATA_',...
+            num2str(cellsize),'m_',num2str(year_aux),'.mat'],'Prs_radar');
+        Prs_spatial = cat(3,Prs_spatial,RADAR_aux.Prs_radar);
         
         % Corrected_spatialField using BK (with 18 rain gauges)
         % BK_aux = load([FILEPATH,'\DATA_INPUT\',CatchName,'_PRSRADAR_BK_DATA_',...

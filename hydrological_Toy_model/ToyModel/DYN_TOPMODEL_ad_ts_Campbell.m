@@ -186,7 +186,9 @@ for i = 2:Ndt
         Pr = Prt.rain(i).*MASK; % [mm/h]  Precipitation<Matrix>
     end
     Pr = double(Pr);
-    
+    if numel(Pr(isnan(Pr)))>0
+        1;
+    end
     if GA == 1
         try
             
@@ -238,15 +240,15 @@ for i = 2:Ndt
         ET = double(squeeze(PET.ETPt(:,:,ceil(i/PET.scale))))/PET.scale.*MASK; 
     end
     
-    % BETA: refer to [Bergström, 1992]
+    % BETA: (Bergström, 1992)
     % BETA = ones(m,n);
     BETA = (O(:,:)-Ohy)./(Oel-Ohy);  BETA(BETA>1) = 1;  BETA(BETA<0) = 0;
     BETA(isnan(BETA)) = 0; % soil water availability factor
     ET = ET.*BETA; %[mm/h]  evapotranspiration<Matrix>
     
     ETr(i) = sum(sum(ET))*(cellsize^2/Area); %[mm/h]  evapotranspiration
-    Rh = Pr - Ks;  
-    Rh(Rh<0) = 0; % [mm/h] Horton Runoff
+    % Rh = Pr - Ks;  
+    % Rh(Rh<0) = 0; % [mm/h] Horton Runoff
     
     if GA == 1
         
@@ -259,6 +261,9 @@ for i = 2:Ndt
         If = Pr;
         If(If>KS_e) = KS_e(If>KS_e);
         If = If*dth; % [mm] Infiltration
+		
+		Rh = Pr - KS_e;
+		Rh(Rh<0 | isnan(Rh)) = 0; % [mm/h] Horton Runoff
         
     elseif GA == 0
         
@@ -266,6 +271,9 @@ for i = 2:Ndt
         If(If>Ks) = Ks(If>Ks);
         If = If*dth; % [mm] Infiltration
         
+		Rh = Pr - Ks;  
+		Rh(Rh<0 | isnan(Rh)) = 0; % [mm/h] Horton Runoff
+	
     elseif GA == 2
         
         
@@ -281,9 +289,9 @@ for i = 2:Ndt
     Ko = Ks.*(O./Osat).^(3+2./L); % Brooks & Corey Unsaturated conductivity surface [mm/h]
     %     Ko = Ks.*(((O-Ohy)./(Osat-Ohy)).^(1/2)).*...
     %         (1-(1-((O-Ohy)./(Osat-Ohy)).^(1./mvg)).^mvg).^2;
-    if sum(isnan(Ko)) > 1
-    disp('111');
-    end
+%     if sum(isnan(Ko)) > 1
+%     disp('111');
+%     end
     
     Ko(isnan(Ko))=0;
     if OPT_UNSAT == 1
