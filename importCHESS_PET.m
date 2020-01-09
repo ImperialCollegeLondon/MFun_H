@@ -44,7 +44,9 @@ function [PETGroup,status] = importCHESS_PET(XX,YY,YEAR)
 %     end
 % end
 % 
-%% generate CHESS PET [mm/day] data for *** region;
+
+%% generate CHESS PET [mm/day] data for a region;
+% XX can be any matrix.
 status = 1;
 
 fprintf('importCHESS_PET started....');

@@ -30,7 +30,7 @@ function [PETGroup,status] = importCHESS_PETI(XX,YY,YEAR)
 % % mkdir([cd,'\CHESS_PETI']);
 % %%
 % YEARRANGE = [2007:2014];
-% options = weboptions('username','yutingchen0604@hotmail.com','password','AaBb14207','Timeout',Inf);
+% options = weboptions('username',getYutingEmail(),'password',getYutingEmail(‘password’),'Timeout',Inf);
 % weblink = 'https://catalogue.ceh.ac.uk/datastore/eidchub/8baf805d-39ce-4dac-b224-c926ada353b7/peti/';
 % for year = YEARRANGE
 %     for mon = 1:12

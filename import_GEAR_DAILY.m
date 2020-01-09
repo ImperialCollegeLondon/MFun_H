@@ -12,7 +12,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor,Y_coor,date0,pl)
+function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor, Y_coor, date0, pl)
 % Processing GEAR.nc data, for derivation of spatial rainfall pattern.
 %
 % Input:
@@ -21,22 +21,33 @@ function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor,Y_coor,date0,pl)
 %     date0
 %     varargin
 %
+% The input have to be the resolution of 1Km
+% X_coor, Y_coor: meshgrid format, with the same distance (1km), can be
+% increasig/descending
+%
 % Output:
 %     XX
 %     YY
 %     RAIN_12
-%
-%
-% Output: monthly spatial pattern of rainfall pattern. 
+% Output: monthly spatial pattern of rainfall
 % RAIN: UNIT: rainfall amount / 365 day
-%     
+% 
+%
+% Example:
+% X_coor = 299000:1000:304000;
+% Y_coor = 636000:1000:651000;
+% [X_coor,Y_coor] = meshgrid(X_coor,Y_coor);
+% 
+% date0 = datenum(datetime(2010,1,1):datetime(2010,12,31));
+% [XX,YY,RAIN] = import_GEAR_DAILY(X_coor,Y_coor,date0,[]);
+%
 %
 % %%
 % YEARRANGE = [2011:2015];
 % options = weboptions('username','yutingchen0604@hotmail.com','password','AaBb14207','Timeout',Inf);
 % weblink = 'https://catalogue.ceh.ac.uk/datastore/eidchub/ee9ab43d-a4fe-4e73-afd5-cd4fc4c82556/GB/daily/';
 % for year = YEARRANGE
-%     
+%
 %     try
 %         OFN = websave(['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'],...
 %             [weblink,'CEH_GEAR_daily_GB_',num2str(year),'.nc'],options);
@@ -44,15 +55,11 @@ function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor,Y_coor,date0,pl)
 %     catch
 %         disp('111');
 %     end
-% 
+%
 % end
 %
 %
 %% save it in different year and different month;
-
-% CHECK no estimate: -2
-
-f_dialog = waitbar(0,'Loading Data ...');
 
 dat = datevec(date0);
 year = unique(dat(:,1));
@@ -60,103 +67,45 @@ if numel(year)>1
     error('check FUNCTION IMPORT_GEAR_DAILY: input year')
 end
 
-dayi = -datenum(datetime(year,1,1,0,0,0))+date0+1;
+dayi = round(-datenum(datetime(year,1,1,0,0,0))+date0+1);
 
-try
-    %D:\CEH_GEAR_Daily
-    source = ['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'];
-    finfo = ncinfo(source);
-    
-    varname = 'rainfall_amount';
-    rainfall_amount = ncread(source,varname);
-    
-    varname = 'x';
-    x = ncread(source,varname); % easting-OSGB36 Grid reference
-    varname = 'y';
-    y = ncread(source,varname); % northing-OSGB36 Grid reference
+%D:\CEH_GEAR_Daily
+source = ['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'];
+finfo = ncinfo(source);
 
-catch
-    fprintf('Check: FUNCTION IMPORT_GEAR_DAILY: DAILY ESTIMATE IS EMPTY');
-end
-
-clear year source varname varname mon
+varname = 'x';
+x = ncread(source,varname); % easting-OSGB36 Grid reference
+varname = 'y';
+y = ncread(source,varname); % northing-OSGB36 Grid reference
 
 %% Define the size;
-pause(0.1);
 
-minX = min(X_coor(:));
-maxX = max(X_coor(:));
-minY = min(Y_coor(:));
-maxY = max(Y_coor(:));
+X_coor = round(X_coor/1000)*1000;
+Y_coor = round(Y_coor/1000)*1000;
 
-indx = find(x<maxX & x>minX);
-indy = find(y<maxY & y>minY);
+X1 = X_coor(1,1);
+X2 = X_coor(end,end);
+Y1 = Y_coor(1,1);
+Y2 = Y_coor(end,end);
 
-[xx0,yy0] = meshgrid(x,y);
+dist = @(x,x0)abs(x-x0);
+get_ind = @(X0,x)find(dist(x,X0) == min(dist(x,X0)));
+xi = [get_ind(X1,x),get_ind(X2,x)];
+yi = [get_ind(Y1,y),get_ind(Y2,y)];
+ti = [dayi(1),dayi(end)];
 
-try
-    dist = @(x,x0)abs(x-x0);
-    indx_min = find(dist(x,minX) == min(dist(x,minX)));
-    indx_max = find(dist(x,maxX) == min(dist(x,maxX)));
-    indy_min = find(dist(y,minY) == min(dist(y,minY)));
-    indy_max = find(dist(y,maxY) == min(dist(y,maxY)));
-    
-    yi = [indy_max(1),indy_min(1)];
-    xi = [indx_min(1),indx_max(1)];
-catch
-    fprintf('Check: FUNCTION IMPORT_GEAR_DAILY.m');
+varname = 'rainfall_amount';
+if yi(2)<yi(1)
+    RAIN=ncread(source,varname,...
+        [xi(1),yi(1),ti(1)],...
+        [xi(2)-xi(1)+1,yi(1)-yi(2)+1,ti(2)-ti(1)+1]);
+    RAIN = RAIN(:,end:-1:1,:);
+else
+    RAIN=ncread(source,varname,...
+        [xi(1),yi(1),ti(1)],...
+        [xi(2)-xi(1)+1,yi(2)-yi(1)+1,ti(2)-ti(1)+1]);
 end
-
-XX = S(yi,xi,xx0);
-YY = S(yi,xi,yy0);
-RAIN = NaN(size(XX,1),size(XX,2),numel(dayi));
-try
-
-for i_d = 1:numel(dayi)
-    
-    rainfall = rainfall_amount(:,:,dayi(i_d));
-    rainfall(rainfall<0) = NaN;
-    RAIN(:,:,i_d) = S(yi,xi,rainfall');
-    
-    waitbar(i_d/numel(dayi),f_dialog,'Processing your data');
-    pause(0.01)
-    
-end
-
-waitbar(1,f_dialog,'Finishing');
-pause(1)
-
-catch
-    fprintf('Check: FUNCTION IMPORT_GEAR_DAILY.m');
-end
-
-if pl
-    figure;
-    for i = 1:numel(dayi)
-        contourf(xx0,yy0,dailyR{i}')
-        rectangle('Position',[minX,minY,maxX-minX,maxY-minY]);hold on;
-        plot(minX,minY,'wp');
-        pause(0.2);
-    end
-end
-delete(f_dialog)
+XX = X_coor;
+YY = Y_coor;
 
 end
-
-function newM = S(Yrange,Xrange,Matrix)
-
-newM = Matrix(Yrange(1):Yrange(2),:);
-newM = newM(:,Xrange(1):Xrange(2));
-
-end
-
-%{
-%set(gca,'visible','off')
-hold on;
-for i = 1:length(A)
-    a = A(i);
-    plot(a.X/unit,a.Y/unit,'--','color','red','linewidth',1);hold on;
-end
-title('Annual rainfall pettern 2001-2015(GEAR)')
-%}
-
