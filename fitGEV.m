@@ -21,15 +21,15 @@ function [parmhat,hobs,hfit] = fitGEV(y,varargin)
 %% Inputparser
 p = inputParser();
 p.CaseSensitive = false;
-p.addOptional('method','Gringorten');
-p.addOptional('dataPlot',0);
+p.addOptional('method','moments');
+p.addOptional('pl',0);
 p.addOptional('returnPeriod',20);
 p.addOptional('colorI',[0.9,0.9,0.9]);
 p.addOptional('masize',4);
 p.parse(varargin{:});
 % shorthen the variables name
 method = p.Results.method ;
-dataPlot = p.Results.dataPlot ;
+pl = p.Results.pl;
 returnPeriod = p.Results.returnPeriod;
 colorI = p.Results.colorI;
 masize = p.Results.masize;
@@ -49,7 +49,7 @@ switch method,
     otherwise
         error(' method is unknown');
 end
-if dataPlot ==1,
+if pl == true
     % measured
     x = ([1:numel(y)])/(numel(y)+1);
     r = 1./(1-x);

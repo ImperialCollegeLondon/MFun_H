@@ -12,6 +12,8 @@ else
         elseif(strcmp(method,'sum')) 
 %             out=sum(A);
             out=nansum(A);
+        elseif strcmp(method,'max')
+            out=nanmax(A,[],1)
         else
             error('function out=aggregate() BUG 1 !!!!')
         end
