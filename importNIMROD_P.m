@@ -1,4 +1,5 @@
-function [PRS,status] = importNIMROD_P(XX,YY,YEARRANGE,varargin)
+function  [DATA,status] = importNIMROD_P(XX,YY,TIME,varargin)
+% 
 % IMPOERTNIMROD_P return the time series of the precipitation over the
 % space
 %
@@ -8,123 +9,84 @@ function [PRS,status] = importNIMROD_P(XX,YY,YEARRANGE,varargin)
 %
 % Input: XX: single value/vector/matrix <double>
 %        YY: same size as XX.
-%        YEARRANGE:
+%        TIME: YEARRANGE <double> or DATATIME<datetime>
 % Output:PRS: 3D Matrix<int16> scale-32;
-
+%
 % Example 1:
 %     %Import PRS data at Yare station
-%     XX = 618200;
-%     YY = 308200;
+%     XX = 618200;% Easting
+%     YY = 308200;% Northing
 %     YEAR = 2007:2008;
 %     [PRS,status] = importNIMROD_P(pointX,pointY,YEAR)
 %     status
-
-
+%
+%
 % Example 2:
 %     % Import PRS data for one catchment
-%     CatchName = 'Lamarsh';
-%     sfName = [CatchName,'_TOPO_DATA_500CellSize.mat'];
-%     C = load(sfName);
-%     [XX,YY] = meshgrid(C.y_yr,C.x_yr);
+%     x_yr = 1000:1000:5000;
+%     y_yr = 10000:-1000:2000;
+%     [XX,YY] = meshgrid(x_yr,y_yr);
 %     YEAR = 2007:2007;
 %     [PRS,status] = importNIMROD_P(XX,YY,YEAR);
 %     status
-
+%
 % by Yuting CHEN
 % Imperial College London
 % yuting.chen17@imperial.ac.uk
-
+%
+% Note: OUTPUT format: [loc1,loc2,time]
+% Exactly in the same acsending/descending/1stNorthing/1stEasting order as input XX, YY.
+% 
+% Update:
+%        2020.05.22 Change output into <class>
+% 
 
 status = 0;
-rp = 'H:\DATA_RADAR\UK_Radar_Matlab\';
-commandwindow
+rp = 'K:\UK_Radar_Matlab\';
 fprintf('Now the file path is: %s\n',rp);
 
-% s = input('Make sure it is right? Y/N [Y]:','s');
-s = 'Y';
-
-if strcmp(s,'Y')
-    %%% okay;
-elseif strcmp(s,'N')
-    fprintf('Please Check Path\n');
-    status = 1;
-    return
+if isdatetime(TIME)
+    DATATIME = TIME;
+    startTime = datetime(datevec(DATATIME(1)));
+    startD = datetime(startTime.Year,startTime.Month,startTime.Day);
+    endTime = datetime(datevec(DATATIME(end)));
+    endD = datetime(endTime.Year,endTime.Month,endTime.Day);
 else
-    fprintf('Please Check Path\n');
-    status = 1;
-    return
+    YEARRANGE = TIME;
+    startD = datetime(min(YEARRANGE),1,1);
+    endD = datetime(max(YEARRANGE),12,31);
 end
-
-% yearRange = 2008:2009;
-startD = datetime(min(YEARRANGE),1,1);
-endD = datetime(max(YEARRANGE),12,31);
-
+PTime = startD:minutes(5):endD+days(1)-minutes(5);
 %%
 tic
 
 totalDays = datenum(endD)-datenum(startD);
 
 nan_day = 0;
+[sei,sej] = deal(NaN);
 
-
-PRS = NaN(size(XX,1),size(XX,2),24*12*(totalDays+1),'single');
+PRS = -1*ones(size(XX,1),size(XX,2),24*12*(totalDays+1),'int16');
 
 for ind_day = 0:totalDays
     tic
     da = startD + ind_day;
     filename = [num2str(da.Year),'_',num2str(da.Month),'_',num2str(da.Day),'.mat'];
+    da.Format = 'yyyyMMddHHmm';
     try
-        A = load([rp,filename]);
-    catch
-        try
-            rp = 'D:\UK_Radar_Matlab\';
-            A = load([rp,filename]);
-        catch
-            try
-            rp = 'H:\UK_Radar_Matlab\';
-            A = load([rp,filename]);
-            catch
-                fprintf('Check!');
-            end
+        load([rp,filename],'DAT');
+        
+        times = fieldnames(DAT,'-full');
+        
+        rains = struct2cell(structfun(@(R)getRain(R), DAT, ...
+            'UniformOutput', false));
+        for minu = 1:length(times)
+            PRS(:,:,ind_day*24*12 + minu) = rains{minu};
         end
         
-    end
-    DAT = A.DAT;
-    times = fieldnames(DAT,'-full');
-
-    for minu = 1:length(times) % for each day; resolution: 5min;
-        eval(['aaa = DAT.' times{minu} ';']);
-        if ~isnan(aaa.rr)         
-            dx = aaa.rl_gen_hd(6);
-            dy = aaa.rl_gen_hd(4);
-            x0 = aaa.rl_gen_hd(5);
-            y0 = aaa.rl_gen_hd(3);
-            loci = @(Y)round((y0-Y)/dy+1);
-            locj = @(X)round((X-x0)/dx+1);
-            sei = loci(YY);
-            sej = locj(XX);
-            RR = aaa.rr;
-            if sum(size(RR)==[2175,1725])==2
-                rain = reshape(RR(unique(sei),unique(sej)),size(sei));% same matrix as in XX and YY;
-                PRS(:,:,ind_day*24*12 + minu) = rain;
-            else
-                rain = NaN(size(XX,1),size(XX,2),'single');
-                PRS(:,:,ind_day*24*12 + minu) = rain;
-            end
-        else
-            % save it as NaN number when the data is not available
-            rain = NaN(size(XX,1),size(XX,2),'single');
-            PRS(:,:,ind_day*24*12 + minu) = rain;
-            nan_day = nan_day + 1;
-            % disp([times{minu},' nan+1-->',num2str(nan_day)]);
-        end
+    catch me
+        me
     end
     disp(['Iter: Day:\n',num2str(ind_day)]);
-    % toc
-%     image(double(aaa.rr));hold on;
-%     %contourf(sei,sej,RR(unique(sei),unique(sej)),'r.');hold on;
-%     plot(sej(:),sei(:),'r.');
-%     pause(0.05);
     
 end
 toc
@@ -133,14 +95,40 @@ disp('finished');
 
 PRS = int16(PRS);
 
+DATA = RainfallDataClass(PRS,-1,32,'mm/h',PTime',XX,YY,'');
+
+if isdatetime(TIME)
+    [isInPeriod,~] = ismember(PTime',TIME);
+    DATA = extractOnePeriod(DATA,isInPeriod);
 end
 
-%%%%%%%%%%%%%%%%%%%%%%
-% See output quality;
-% for i = 1:size(PRS,3)
-%     imagesc(squeeze(PRS(:,:,i)));
-%     pause(0.02)
-% end
-
+%%
+    function rain = getRain(aaa)
+        if isnan(sei)
+            dx = aaa.rl_gen_hd(6);
+            dy = aaa.rl_gen_hd(4);
+            x0 = aaa.rl_gen_hd(5);
+            y0 = aaa.rl_gen_hd(3);
+            loci = @(Y)round((double(y0)-double(Y))/double(dy)+1);
+            locj = @(X)round((double(X)-double(x0))/double(dx)+1);
+            sei = loci(YY);
+            sej = locj(XX);
+        end
+        
+        if ~isnan(aaa.rr)
+            RR = aaa.rr;
+            if sum(size(RR)==[2175,1725])==2
+                rain = RR(sub2ind(size(RR),sei,sej));
+            else
+                rain = ones(size(XX,1),size(XX,2),'int16')*(-1);
+            end
+        else
+            % save it as '-1' when the data is not available
+            rain = ones(size(XX,1),size(XX,2),'int16')*(-1);
+            nan_day = nan_day + 1;
+        end
+        
+    end
+end
 
 

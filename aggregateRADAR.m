@@ -50,7 +50,8 @@ if ~(dt <= T)
         end
     end
 end
-%%% Double.
+
+%%% single/int16/double
 Data = Prs;
 
 %%% Processing For NaN Value.

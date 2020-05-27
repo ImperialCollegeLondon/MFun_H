@@ -27,7 +27,7 @@ function [status] = aggregate_NIMROD_Hour(YEAR,varargin)
 
 status = 0;
 commandwindow
-rp = 'F:\NIMROD_Radar_2\';%'H:\DATA_RADAR\UK_Radar_Matlab\';
+rp = 'K:\UK_Radar_Matlab\';%'H:\DATA_RADAR\UK_Radar_Matlab\';
 fprintf('Now the file path is: %s\n',rp);
 
 
@@ -70,7 +70,7 @@ for ind_day = 0:totalDays
     filename = [num2str(da.Year),'_',num2str(da.Month),'_',num2str(da.Day),'.mat'];
     try
         load([rp,filename],'DAT');
-    catch
+    catch me
         continue
     end
     times = fieldnames(DAT,'-full');

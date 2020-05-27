@@ -54,7 +54,7 @@ end
 rfpath = 'C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\';%matlab_batch\';
 obsCol = [1 0 0];
 simCol = [0.4 0.4 0.4];
-simAlpha = 0.1;
+simAlpha = 0.15;
 obsAlpha = 0.35;
 for pltag = 1:length(SEASON)
     axes(HA(pltag))
@@ -111,12 +111,26 @@ for pltag = 1:length(SEASON)
     grid minor
     % ax.XAxis.Scale = 'log';
     ylim([0,YRANGE(pltag)]);
+    if dt == 1 && season ==  4
+        yticks(0:200:YRANGE(pltag))
+        yticklabels(0:200:YRANGE(pltag))
+    else
+        yticks(0:50:YRANGE(pltag))
+        yticklabels(0:50:YRANGE(pltag))
+    end
     xlim([fv(1.1) fv(22)])
     
-    text(fv(21.5),max(ylim)-0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
-        'background',[0.9 0.9 0.9],...
-        'HorizontalAlignment','right',...
-        'VerticalAlignment','middle');
+    if season == 4
+        text(fv(21.5),min(ylim)+0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
+            'background',[0.9 0.9 0.9],...
+            'HorizontalAlignment','right',...
+            'VerticalAlignment','middle');
+    else
+        text(fv(21.5),max(ylim)-0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
+            'background',[0.9 0.9 0.9],...
+            'HorizontalAlignment','right',...
+            'VerticalAlignment','middle');
+    end
     
     XYWH = [150,150,400,200];
     set(gcf,'units','points','position',XYWH);

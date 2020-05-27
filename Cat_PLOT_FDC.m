@@ -1,4 +1,4 @@
-CatchName = 'Stratford';%'Welland';%
+CatchName ='Stratford';%'Welland';% 
 
 mon = [12 1 2 3];
 seasonName = 'DJFM';
@@ -8,12 +8,13 @@ seasonName = 'DJFM';
 
 % mon = [1:12];
 % seasonName = 'ALL';
+close all
 
 annualPL = false;
 itag = 1;
 for dt = 1%[1,24]
     figure;
-    setFigureProperty;
+    setFigureProperty('Subplot2')
     disFlow = 0.1;%0.2;
     
     method = {'GEAR'};%{'BK'};%{'CKED'};
@@ -29,27 +30,20 @@ for dt = 1%[1,24]
     xlabel('Percentage of time flow exceeded');
     text(2,0.2,...
         [char(getMonthName(mon(1))),' to ',char(getMonthName(mon(end)))],...
-        'fontsize',10);
-    
+        'fontsize',12);
+    set(gca,'linewidth',2)
     xlim([0 100]);
     ylim([disFlow 600]);
-    XYWH = [150,150,250,225];
-    set(gcf,'units','points','position',XYWH);
-%     savetag = input('Ensure to save this figure? Y/N','s');
-%     
-%     if strcmp(savetag,'Y')
-%         
-%         savePath = ['C:\Users\Yuting Chen\Dropbox (Personal)\Data_PP\STNSRP\FIG_Pub\'];
-%         saveName = ['FDC_',CatchName,'Area_',num2str(dt),'h_10sim_',...
-%             seasonName,'_',method{1}];
-%         saveas(gcf,[savePath,saveName],'fig');
-%         saveas(gcf,[savePath,saveName],'png');
-%         saveas(gcf,[savePath,saveName],'eps');
-%         fprintf('Saved');
-%         
-%     else
-%         fprintf('No Save');
-%     end
+    
+    yticks([-0.1,1,10,100])
+    yticklabels([-0.1,1,10,100])
+    xticks(0:20:100)
+    xticklabels([0,20,40,60,80,100])
+    
+    filePath = ['C:\Users\Yuting Chen\Dropbox (Personal)\Data_PP\STNSRP\FIG_Pub'];
+    filename = [filePath,filesep,'FDC_',CatchName,'Area_',num2str(dt),'h_10sim_',...
+        seasonName,'_',method{1}];
+    savePlot(filename,'XYWH',[150,150,250,225],'needreply','N');
     
 end
 

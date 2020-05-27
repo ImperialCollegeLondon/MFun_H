@@ -24,6 +24,8 @@ function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor, Y_coor, date0, pl)
 % The input have to be the resolution of 1Km
 % X_coor, Y_coor: meshgrid format, with the same distance (1km), can be
 % increasig/descending
+% The input length has to be within one year (only read one file in this function)
+% Also Be careful about the different Coor order.
 %
 % Output:
 %     XX
@@ -44,7 +46,7 @@ function [XX,YY,RAIN] = import_GEAR_DAILY(X_coor, Y_coor, date0, pl)
 %
 % %%
 % YEARRANGE = [2011:2015];
-% options = weboptions('username','yutingchen0604@hotmail.com','password','AaBb14207','Timeout',Inf);
+% options = weboptions('username',getYutingEmail(),'password',getYutingEmail('PAssword'),'Timeout',Inf);
 % weblink = 'https://catalogue.ceh.ac.uk/datastore/eidchub/ee9ab43d-a4fe-4e73-afd5-cd4fc4c82556/GB/daily/';
 % for year = YEARRANGE
 %
@@ -107,5 +109,6 @@ else
 end
 XX = X_coor;
 YY = Y_coor;
+RAIN = permute(RAIN,[2,1,3]);
 
 end

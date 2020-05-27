@@ -67,7 +67,7 @@ function varargout = cptcmap(varargin)
 %
 %   cmap:       ncol x 3 colormap array
 %
-%   lims:       1 x 2 array holding minimum and maximum values for which
+%   clims:       1 x 2 array holding minimum and maximum values for which
 %               the colormap is defined.  
 %
 %   ticks:      vector of tick values specifying where colors were defined

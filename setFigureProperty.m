@@ -22,22 +22,29 @@ function handle = setFigureProperty(varargin)
 % by Yuting Chen
 %  Imperial College London
 
-set(0,'defaultAxesFontSize',12,'defaultAxesFontName','Calibri','defaultAxesTitleFontWeight','Normal');
+set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
+    'defaultAxesTitleFontWeight','Bold',...
+    'DefaultLineLineWidth', 2,...
+    'defaultTextFontSize',15);
+
 if nargin == 0
-    set(0,'defaultAxesFontSize',12,'defaultAxesFontName','Calibri Light','defaultAxesTitleFontWeight','Normal');
+    set(0,'defaultAxesFontSize',20,'defaultAxesFontName','Arial','defaultAxesTitleFontWeight','Normal');
     XYWH = [150,150,250,180];
     set(gcf,'units','points','position',XYWH);
 else
     if nargin == 1
         if isnumeric(varargin{1})
             set(0,'defaultAxesFontSize',14,'defaultAxesFontName',...
-                'Tw cen MT','defaultAxesTitleFontWeight','Normal');
+                'Arial','defaultAxesTitleFontWeight','Normal');
             XYWH = [50,-50,varargin{1}(1),varargin{1}(2)];
             set(gcf,'units','points','position',XYWH);
         else
             switch(varargin{1})
+                case 'Meeting'
+                    set(0,'defaultAxesFontSize',20,'defaultAxesFontName','Arial','defaultAxesTitleFontWeight','Normal');
+                    
                 case 'Big'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial','defaultAxesTitleFontWeight','Normal');
                     
                     XYWH = [50,-50,400,350];
                     set(gcf,'units','points','position',XYWH);
@@ -50,29 +57,30 @@ else
                     XYWH = [50,-50,900,380];
                     set(gcf,'units','points','position',XYWH);
                 case 'Paper'
-                    set(0,'defaultAxesFontSize',14);
+                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
+                        'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,600,450];
                     set(gcf,'units','points','position',XYWH);
                 case 'Paper_2'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,600,225];
                     set(gcf,'units','points','position',XYWH);
                 case 'Paper_4'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,600,450];
                     set(gcf,'units','points','position',XYWH);
                     
                 case 'Subplot4'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
+                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,750,225];
                     set(gcf,'units','points','position',XYWH);
                     
                 case 'Subplot2'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
-                    XYWH = [50,-50,550,220];
+                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
+                        'defaultAxesTitleFontWeight','Normal');
+                    XYWH = [50,-50,500,220];
                     set(gcf,'units','points','position',XYWH);
                 case 'Subplot3'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Cambria','defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,750,220];
                     set(gcf,'units','points','position',XYWH);
                 otherwise
