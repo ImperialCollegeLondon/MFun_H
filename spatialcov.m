@@ -59,10 +59,10 @@ for ir = 1:length(distance)
         setInd = setStart:1:min(setStart+setLen-1,thisWholeLen);
         if ~isempty(setInd)
             covariance(ir,:) = covariance(ir,:)+sum(D(is,:) & D(js,:),1) ;
-            ncov(ir) = ncov(ir)+length(is);
             setStart = setInd(end)+1;
         end
     end
+    ncov(ir) = ncov(ir)+length(is);
     toc
 end
 
