@@ -76,9 +76,9 @@ source = ['K:\GEAR\CEH_GEAR_daily_GB_',num2str(year),'.nc'];
 finfo = ncinfo(source);
 
 varname = 'x';
-x = ncread(source,varname); % easting-OSGB36 Grid reference
+gear_x = ncread(source,varname); % easting-OSGB36 Grid reference
 varname = 'y';
-y = ncread(source,varname); % northing-OSGB36 Grid reference
+gear_y = ncread(source,varname); % northing-OSGB36 Grid reference
 
 %% Define the size;
 
@@ -90,16 +90,16 @@ X2 = X_coor(end,end);
 Y1 = Y_coor(1,1);
 Y2 = Y_coor(end,end);
 
-dist = @(x,x0)abs(x-x0);
-get_ind = @(X0,x)find(dist(x,X0) == min(dist(x,X0)));
-xi = [get_ind(X1,x),get_ind(X2,x)];
-yi = [get_ind(Y1,y),get_ind(Y2,y)];
+dist = @(loc,LOC0)abs(loc-LOC0);
+get_ind = @(LOC0,loc)find(dist(loc,LOC0) == min(dist(loc,LOC0)));
+xi = [get_ind(X1,gear_x),get_ind(X2,gear_x)];
+yi = [get_ind(Y1,gear_y),get_ind(Y2,gear_y)];
 ti = [dayi(1),dayi(end)];
 
 varname = 'rainfall_amount';
 if yi(2)<yi(1)
     RAIN=ncread(source,varname,...
-        [xi(1),yi(1),ti(1)],...
+        [xi(1),yi(2),ti(1)],...
         [xi(2)-xi(1)+1,yi(1)-yi(2)+1,ti(2)-ti(1)+1]);
     RAIN = RAIN(:,end:-1:1,:);
 else
