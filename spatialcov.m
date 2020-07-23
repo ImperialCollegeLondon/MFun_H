@@ -15,7 +15,7 @@ function [covariance,distance,r,disI,disJ,Ind_p1s,Ind_p2s]=spatialcov(X,Y,Data,d
 if length(size(Data)) == 2
     Data = reshape(Data,[size(Data),1]);
 end
-if prod(size(Data,[1,2]))>12100 || prod(size(Data,[1,2,3]))>12100*20000
+if prod(size(Data,[1,2]))>12100 || prod(size(Data,[1,2,3]))>12100*40000
     error('Normal PCs Memory might be not enough to compute this BIG array in this fast-script.')
 end
 
@@ -47,12 +47,11 @@ if isempty(r)
 end
 Data = reshape(Data,[],size(Data,3));
 for ir = 1:length(distance)
-    tic
     p1_s = Ind_p1s{ir};
     p2_s = Ind_p2s{ir};
     thisWholeLen = length(p1_s);
     setStart = 1;
-    setLen = 500000;% this number is set based on yt PC's total RAM.
+    setLen = 400000;% this number is set based on yt PC's total RAM.
     for setNo = 1:ceil(thisWholeLen/setLen)
         setInd = setStart:1:min(setStart+setLen-1,thisWholeLen);
         if ~isempty(setInd)
@@ -62,7 +61,6 @@ for ir = 1:length(distance)
         end
     end
     ncov(ir,:) = ncov(ir,:)+thisWholeLen;
-    toc
 end
 
 % for i = 1:size(D,1)

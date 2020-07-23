@@ -35,7 +35,7 @@ if reply == 'Y'
     
     if ~(NameValueArgs.onlyPng)
         % saveas(gcf,filename,'eps')
-        saveas(gcf,filename,'pdf')
+        % saveas(gcf,filename,'pdf')
         saveas(gcf,filename,'fig')
     end
     

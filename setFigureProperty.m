@@ -61,6 +61,11 @@ else
                         'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,600,450];
                     set(gcf,'units','points','position',XYWH);
+                case 'Single'
+                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
+                        'defaultAxesTitleFontWeight','Normal');
+                    XYWH = [0,0,8,8];
+                    set(gcf,'units','centimeters','position',XYWH);
                 case 'Paper_2'
                     set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
                     XYWH = [50,-50,600,225];
