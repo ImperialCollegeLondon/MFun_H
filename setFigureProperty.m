@@ -57,8 +57,8 @@ else
                     XYWH = [50,-50,900,380];
                     set(gcf,'units','points','position',XYWH);
                 case 'Paper'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
-                        'defaultAxesTitleFontWeight','Normal');
+                    set(0,'defaultAxesFontSize',10,'defaultAxesFontName','Arial',...
+                        'defaultAxesTitleFontWeight','Normal','defaultTextFontSize',10);
                     XYWH = [50,-50,600,450];
                     set(gcf,'units','points','position',XYWH);
                 case 'Single'
@@ -66,28 +66,6 @@ else
                         'defaultAxesTitleFontWeight','Normal');
                     XYWH = [0,0,8,8];
                     set(gcf,'units','centimeters','position',XYWH);
-                case 'Paper_2'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
-                    XYWH = [50,-50,600,225];
-                    set(gcf,'units','points','position',XYWH);
-                case 'Paper_4'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
-                    XYWH = [50,-50,600,450];
-                    set(gcf,'units','points','position',XYWH);
-                    
-                case 'Subplot4'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesTitleFontWeight','Normal');
-                    XYWH = [50,-50,750,225];
-                    set(gcf,'units','points','position',XYWH);
-                    
-                case 'Subplot2'
-                    set(0,'defaultAxesFontSize',14,'defaultAxesFontName','Arial',...
-                        'defaultAxesTitleFontWeight','Normal');
-                    XYWH = [50,-50,500,220];
-                    set(gcf,'units','points','position',XYWH);
-                case 'Subplot3'
-                    XYWH = [50,-50,750,220];
-                    set(gcf,'units','points','position',XYWH);
                 otherwise
             end
         end
