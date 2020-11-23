@@ -71,6 +71,7 @@ else
                     XYWH = [0,0,8,8];
                     set(gcf,'units','centimeters','position',XYWH);
                 otherwise
+
             end
         end
     else

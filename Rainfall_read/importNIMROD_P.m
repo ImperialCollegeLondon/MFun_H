@@ -64,11 +64,12 @@ totalDays = datenum(endD)-datenum(startD);
 
 nan_day = 0;
 % [sei,sej] = deal(NaN);
-
 PRS = -1*ones(size(XX,1),size(XX,2),24*12*(totalDays+1),'int16');
 
 for ind_day = 0:totalDays
+
     [sei,sej] = deal(NaN);
+
     tic
     da = startD + ind_day;
     filename = [num2str(da.Year),'_',num2str(da.Month),'_',num2str(da.Day),'.mat'];

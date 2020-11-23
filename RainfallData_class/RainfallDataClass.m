@@ -155,7 +155,7 @@ classdef RainfallDataClass
             end
         end
         
-        function obj = aggregateDC(obj,scaleDx,scaleDt,Unit)
+        function obj = aggregate(obj,scaleDx,scaleDt,Unit)
             if scaleDx ~= 1 || scaleDt ~= 1
                 oridata = originalData(obj,'single');
                 if logical(~mod(scaleDx,1)) && logical(~mod(scaleDt,1))
