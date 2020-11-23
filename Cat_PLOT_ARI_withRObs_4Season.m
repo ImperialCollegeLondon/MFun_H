@@ -1,50 +1,37 @@
 % CAT-PLOT-ARI-WITHR
 
-function Cat_PLOT_ARI_withRObs_4Season(dt,CatchName,sp,HA,SEASON,YRANGE)
+function Cat_PLOT_ARI_withRObs_4Season(dt,CatchName,sp,HA,SEASON,YRANGE,expNos)
 % Example:
 % sp = 0;%saveplot or not
 % Cat_PLOT_ARI_withRObs_4Season(1,'Welland',sp,...)
 % Update: 2020.01.05 Yuting
 
-fv = @(T)T;%-log(-log(1-1./T));%T;%
+fv = @(T)-log(-log(1-1./T));%T;%T;%
 a = 0.44;
 getGringP = @(x)((1:length(x))-a)./(length(x)+1-2*a);
 getReturnY = @(x) 1./(1-squeeze(x));
 
 mermethod = 'GEAR';%'GEAR';%'BK';%'KED';%'CKED';%
-[sim,obs] = Cat_PLOT_ARI(dt,{mermethod},CatchName);% only BK is considered for East Anglia
-
-% prepare for Running R.scirpt
-createSeasonTable=@(AM)table(AM(1,:)',AM(2,:)',AM(3,:)',AM(4,:)','VariableNames',{'MAM','JJA','SON','DJF'});
-A = createSeasonTable(obs.AM_o);
-writetable(A,['C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\obs_in_',...
-    num2str(dt),'_',mermethod,'_',CatchName,'.txt']);
-
-sim.AM_s = sim.AM_s;
-sim_aux = permute(sim.AM_s,[1 3 2]);
-
-% sim_aa = [];
-% for season_i = 1:4
-%     sim_aa(:,season_i) = reshape(squeeze(sim_aux(:,:,season_i)),[],1);
-% end
-% sim_aux = sim_aa;
+[sim,obs] = Cat_PLOT_ARI(dt,{mermethod},CatchName,expNos);
 % 
-% A = createSeasonTable(sim_aux');
-% writetable(A,['C:\Users\Yuting Chen\Desktop\Extreme\matlab_batch\sim_in_',...
-%     num2str(dt),'_',CatchName,'.txt']);
-% % close all;
-
-
-
-for iter = 1:10
-    sim_aa = [];
-    for season_i = 1:4
-        sim_aa(:,season_i) = reshape(squeeze(sim_aux(iter,:,season_i)),[],1);
-    end
-    A = createSeasonTable(sim_aa');
-    writetable(A,['C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\sim_in_',...
-        num2str(dt),'_',CatchName,'_iter',num2str(iter),'.txt']);
-end
+% % prepare for Running R.scirpt
+% createSeasonTable=@(AM)table(AM(1,:)',AM(2,:)',AM(3,:)',AM(4,:)','VariableNames',{'MAM','JJA','SON','DJF'});
+% A = createSeasonTable(obs.AM_o);
+% writetable(A,['C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\obs_in_',...
+%     num2str(dt),'_',mermethod,'_',CatchName,'.txt']);
+% 
+% sim.AM_s = sim.AM_s;
+% sim_aux = permute(sim.AM_s,[1 3 2]);
+% 
+% for iter = 1:size(sim_aux,1)
+%     sim_aa = [];
+%     for season_i = 1:4
+%         sim_aa(:,season_i) = reshape(squeeze(sim_aux(iter,:,season_i)),[],1);
+%     end
+%     A = createSeasonTable(sim_aa');
+%     writetable(A,['C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\sim_in_',...
+%         num2str(dt),'_',CatchName,'_iter',num2str(expNos(iter)),'.txt']);
+% end
 
 
 % close all;
@@ -54,7 +41,7 @@ end
 rfpath = 'C:\Users\Yuting Chen\Desktop\Extreme\Ensembles\';%matlab_batch\';
 obsCol = [1 0 0];
 simCol = [0.4 0.4 0.4];
-simAlpha = 0.1;
+simAlpha = 0.15;
 obsAlpha = 0.35;
 for pltag = 1:length(SEASON)
     axes(HA(pltag))
@@ -91,37 +78,56 @@ for pltag = 1:length(SEASON)
     
     [hsimGumbel,hsimGumbeluncer,hsimEnsuncer] = plotSIM(simAlpha,rt,lmu,xx,minS,maxS,...
         rtx_temp,fit_aux_y);
+    ylim([0,YRANGE(pltag)]);
     
     % load OBS %
     [rt,lmu,minS,maxS,areacolor] = loadOBS();
     % Plot OBS %
     [hobs,hobsGumbel,hobsGumbeluncer] = plotOBS(obsAlpha);
-    
 
     % Legend %
-    lgd = legend([hsimGumbel,hsimGumbeluncer,hobsGumbel,hobsGumbeluncer],...
-        'Mean of Ensembels','95%CI of Ensembles','Reference','95%CI of Reference',...
-        'Location','Northwest');% hobs,'Observed',
+    lgd = legend([hsimGumbel,hsimGumbeluncer,hobs,hobsGumbel,hobsGumbeluncer],...
+        'Mean of Ensembels','Range of Ensembles','Reference','Fitted Reference','95%CI of Fitted Reference',...
+        'Location','Northwest','Orientation','horizontal','NumColumns',2);% hobs,'Observed',
     lgd.TextColor = 'black';
     legend('boxoff')
-    xlabel('Return Period [year]');
+    if fv(1)==1
+        xlabel('Return Period [year]');
+    else
+        xlabel('Gumbel reduced variate');
+    end
     ylabel([timescale(dt),' Peak Discharge[m^3/s]']);
     ax = gca;
     hold on;
+    box off
     grid minor
     % ax.XAxis.Scale = 'log';
     ylim([0,YRANGE(pltag)]);
-    xlim([fv(1.1) fv(22)])
+    if dt == 1 && season ==  4
+        yticks(0:200:YRANGE(pltag))
+        yticklabels(0:200:YRANGE(pltag))
+    else
+        yticks(0:50:YRANGE(pltag))
+        yticklabels(0:50:YRANGE(pltag))
+    end
+    xlim([fv(1.1) fv(30)])
     
-    text(fv(21.5),max(ylim)-0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
-        'background',[0.9 0.9 0.9],...
-        'HorizontalAlignment','right',...
-        'VerticalAlignment','middle');
+    if season == 4 % min(ylim)+0.1*range(ylim)
+        text(fv(21.5),max(ylim)-0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
+            'background',[0.98 0.98 0.98,0.1],...
+            'HorizontalAlignment','right',...
+            'VerticalAlignment','middle');
+    else
+        text(fv(21.5),max(ylim)-0.1*range(ylim),[getRiverName(CatchName),'-',getSeasonName(season)],...
+            'background',[0.98 0.98 0.98,0.1],...
+            'HorizontalAlignment','right',...
+            'VerticalAlignment','middle');
+    end
     
     XYWH = [150,150,400,200];
     set(gcf,'units','points','position',XYWH);
-    
-    
+    axis('square')
+    set(gca,'linewidth',1)
     % ax.XAxis.Scale = 'log';
 end
 set(HA(2:end),'YLabel',[]);
@@ -157,10 +163,11 @@ end
         mextreme = [];
         if iscell(lmu)
             for itersim = 1:length(lmu)
-                [hsimGumbel,hsimGumbeluncer,hsimEnsuncer] = plotSIM(alpha,rt,lmu{itersim},xx,minS{itersim},maxS{itersim});
+                % [hsimGumbel,hsimGumbeluncer,hsimEnsuncer] = plotSIM(alpha,rt,lmu{itersim},xx,minS{itersim},maxS{itersim},...
+                %     rtx_temp,fit_aux_y);
                 mextreme(:,itersim) = lmu{itersim}(:,2);
-            
             end
+            hsimGumbeluncer = fillArea(fv(rtx_temp),prctile(mextreme,95,2),prctile(mextreme,5,2),'k',alpha);hold on;
             hsimGumbel = plot(fv(xx),getGumbelYY_haveRT(rt,nanmean(mextreme,2),xx),'-',...
                 'color',simCol,'linewidth',2);hold on;
             
@@ -174,8 +181,8 @@ end
             text10_15(fv(10),fv(15),fv(1.1),lmu,simCol);
         end
 %         hsimGumbeluncer = fillArea(fv(rtx_temp),prctile(fit_aux_y,95,1),...
-%             prctile(fit_aux_y,5,1),'k',alpha-0.55);hold on;
-%         hsimGumbel = plot(fv(rtx_temp),prctile(fit_aux_y,50,1),'^-',...
+%             prctile(fit_aux_y,5,1),'k',alpha);hold on;
+%         hsimGumbel = plot(fv(rtx_temp),nanmean(fit_aux_y,1),'^-',...
 %                 'color',simCol,'linewidth',2);hold on;
     end
 
@@ -194,9 +201,15 @@ end
 
         % true p from observed
         hobs = plot(fv(getReturnY(getGringP(obs.AM_o(season,:)))),...
-            sort(obs.AM_o(season,:)),'x',...
-            'color',obsCol,'Markersize',3,'markerfacecolor',obsCol,'linewidth',1);
+            sort(obs.AM_o(season,:)),'o',...
+            'color',obsCol,'Markersize',2,'markerfacecolor',obsCol,'linewidth',1);
         text10_15(fv(10),fv(15),fv(1.1),lmu,obsCol);
+        
+        
+%         rtp = [2,5,10,20];
+%         txtstr = {'2','5','10','  20yr'};
+%         addRTAxis(rtp,txtstr);
+        
         
 %         [parmhat0,~,~] = fitGEV(obs.AM_o(season,:),'method','Gringorten');
 %         gevfitobs = gevinv(1-1./rtx_temp,parmhat0(1),parmhat0(2),parmhat(3));
@@ -204,7 +217,7 @@ end
 %                 'color',obsCol,'linewidth',2);hold on;
         
         
-        set(hobs,'visible','off')
+        % set(hobs,'visible','off')
         % plot(grv(:,[1 3]),lmu(:,[1 3]),'b:','linewidth',1);hold on;
     end
 
@@ -232,7 +245,7 @@ end
         [lmu,minS,maxS] = deal([]);
         for itersim = 1:size(sim.AM_s,1)
             rfName = ['sim_out_',num2str(dt),'_',CatchName,'_iter',...
-                num2str(itersim),getSeasonName(season),'.txt'];
+                num2str(expNos(itersim)),getSeasonName(season),'.txt'];% expNos(itersim))
             lmu{itersim} = load([rfpath,rfName]);
             grv = repmat(rt,1,3);
             minS{itersim} = getGumbelYY_haveRT(rt,lmu{itersim}(:,1),xx);
@@ -243,6 +256,24 @@ end
     end
 
 end
+
+%%
+
+function addRTAxis(RT,txtstr)
+x = -log(-log(1-1./RT));
+yloc = ylim;
+ylimrg = yloc(2)-yloc(1);
+yloc =yloc(2)*0.1;
+
+plot([x(1),x(end)],[yloc,yloc],'k-','linewidth',0.5);hold on;
+for i = 1:length(RT)
+    plot([x(i),x(i)],[yloc,yloc+ylimrg*0.03],'k-','linewidth',0.5);hold on;
+    text(x(i),yloc,txtstr{i},'VerticalAlignment','top',...
+        'HorizontalAlignment','center','fontsize',8)
+end
+
+end
+
 
 function [parmhat,hobs,hfit] = getFitAMD(AM0,color,masize)
 
@@ -324,7 +355,7 @@ yy = polyval(p,-log(-log(opp(:))));
 end
 
 
-function [sim,obs] = Cat_PLOT_ARI(dt,method,CatchName)
+function [sim,obs] = Cat_PLOT_ARI(dt,method,CatchName,expNos)
 % dt = 24;
 mon = 1:12;
 annualPL = false;
@@ -333,7 +364,7 @@ annualPL = false;
 
 % method = {'BK'};
 xx = [0.01:0.2:100];
-[timeSeries] = Cat_PLOT_CompareWithNS_maxArea(method,dt,mon,annualPL,-1,xx,CatchName);
+[timeSeries] = Cat_PLOT_CompareWithNS_maxArea(method,dt,mon,annualPL,-1,xx,CatchName,expNos);
 
 sim = struct;
 obs = struct;

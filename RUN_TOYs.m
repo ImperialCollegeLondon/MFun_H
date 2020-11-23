@@ -89,14 +89,23 @@ for year_aux = YEARRANGE
             Prs_spatial = cat(3,Prs_spatial,NS_aux.rain);
             
             fprintf('SYNTHETIC RAINFALL in-- %s --is USED.\n',NSfilePath);
-        elseif simNo>200
+        elseif simNo>200 & simNo<300
             % USE SIM DATA
             NSfilePath = ['F:\Sim_NS_',CatchName,'_resized\'];
             fileName = ['Rainfall_sim_',num2str(simNo-200),'_',num2str(year_aux),'.mat'];
             load([NSfilePath,fileName],'rain');
             Prs_spatial = cat(3,Prs_spatial,rain);
             clear rain
-
+            
+            fprintf('SYNTHETIC RAINFALL in-- %s --is USED.\n',NSfilePath);
+        elseif simNo>300
+            % USE SIM DATA
+            NSfilePath = ['F:\Sim_NS_',CatchName,'_resized_cone\'];
+            fileName = ['Rainfall_sim_',num2str(simNo-300),'_',num2str(year_aux),'.mat'];
+            load([NSfilePath,fileName],'rain');
+            Prs_spatial = cat(3,Prs_spatial,rain);
+            clear rain
+            
             fprintf('SYNTHETIC RAINFALL in-- %s --is USED.\n',NSfilePath);
         end
     end

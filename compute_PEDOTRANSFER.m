@@ -12,8 +12,7 @@ function [Osat,L,Pe,Ks,O33] = compute_PEDOTRANSFER(SAND,CLAY,ORG);
 % No-data value: input is set as NaN
 %                output is set as NaN
 %
-% by Yuting CHEN
-% yuting.chen17@imperial.ac.uk
+% by TitianChen
 % Imperial College London
 
 fprintf('---------------Input Statistics--------------\n');
