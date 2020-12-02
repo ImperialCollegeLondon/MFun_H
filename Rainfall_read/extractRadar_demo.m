@@ -1,67 +1,41 @@
-function  [DATA,status] = importNIMROD_P(XX,YY,TIME,varargin)
-% IMPOERTNIMROD_P returns the time series of the precipitation over the
-% space
+% extractRadar_demo.m
 %
-% Radar Format: NIMROD weather radar data in UK.
-% Default radar file location: 'K:\UK_Radar_Matlab'
+% this .m file shows how to extract radar info for a study area,
+% from the 'F:\UK_Radar_Matlab\'.
 %
-%
-% Input: XX: single value/vector/matrix <double>
-%        YY: same size as XX.
-%        TIME: YEARRANGE <double> or DATATIME<datetime>
-% Output:PRS: 3D Matrix<int16> scale-32;
-%
-% Example 1:
-%     %Import PRS data at Yare station
-%     XX = 618200;% Easting
-%     YY = 308200;% Northing
-%     YEAR = datetime(2000,1,1):datetime(2001:12,31,10,20,0);
-%     [PRS,status] = importNIMROD_P(pointX,pointY,YEAR)
-%     status
-%
-%
-% Example 2:
-%     % Import PRS data for one catchment
-%     x_yr = 530e3:1e3:540e3;
-%     y_yr = 180e3:1e3:185e3;
-%     [XX,YY] = meshgrid(x_yr,y_yr);
-%     YEAR = 2007:2007;
-%     [PRS,status] = importNIMROD_P(XX,YY,YEAR);
-%     status
-%
-% by Yuting CHEN
+% Yuting Chen
 % Imperial College London
-% yuting.chen17@imperial.ac.uk
-%
-% Note: OUTPUT format: [loc1,loc2,time]
-% Exactly in the same acsending/descending/1stNorthing/1stEasting order as input XX, YY.
-% 
-% Update:
-%        2020.05.22 Change output into <class>
-% 
 
-status = 0;
-rp = 'K:\UK_Radar_Matlab\';
-fprintf('Now the file path is: %s\n',rp);
+%% main
+clear;clc
 
-if isdatetime(TIME)
-    DATATIME = TIME;
-    t_temp = datetime(datevec(DATATIME(1)));
-    startD = datetime(t_temp.Year,t_temp.Month,t_temp.Day);
-    t_temp = datetime(datevec(DATATIME(end)));
-    endD = datetime(t_temp.Year,t_temp.Month,t_temp.Day);
-else
-    YEARRANGE = TIME;
-    startD = datetime(min(YEARRANGE),1,1);
-    endD = datetime(max(YEARRANGE),12,31);
-end
-T_days = startD:days(1):endD;
-PrsTime = startD:minutes(5):endD+days(1)-minutes(5);
+[PRS,T,XX,YY] = extractDays();
 
-%%
-tic
+% plt time series at one location
+figure;
+plot(T,squeeze(PRS(1,1,:)));
+xlabel('Time');
+ylabel('Intensity [mm/h]');
+
+%% auxillary func
+function [PRS,T,XX,YY] = extractDays()
+% Output:
+%       PRS: intensity[mm/h] <double>
+%       T: time <datetime>
+%       XX: easting[m] <double>
+%       YY: northing[m] <double>
+
+%% configuration
+filepath = ['F:\UK_Radar_Matlab\'];
+x_yr = 530e3:1e3:540e3;
+y_yr = 180e3:1e3:185e3;
+[XX,YY] = meshgrid(x_yr,y_yr);
+T_days = datetime(2010,8,21:22);
+
+%% extraction
 
 T = datetime(T_days(1)):minutes(5):datetime(T_days(end)+days(1)-minutes(5));
+
 PRS = int16(-ones([size(XX),numel(T)]));
 itag = 0;
 
@@ -90,20 +64,13 @@ for oneDay = T_days
     itag = itag+1;
     
 end
-toc
 
-disp('finished');
+%% transformation
+PRS = double(PRS);
+PRS(PRS == -1) = NaN;
+PRS = PRS/32;% unit: [mm/h]
 
-PRS = int16(PRS);
-
-DATA = RainfallDataClass(PRS,-1,32,'mm/h',PrsTime',XX,YY,'');
-
-if isdatetime(TIME)
-    [isInPeriod,~] = ismember(PrsTime',TIME);
-    DATA = extractOnePeriod(DATA,isInPeriod);
-end
-
-%%
+%% nested func
     function rain = getRain(oneSnapshot,XX,YY)
         
         if isempty(loci) % prevent repeated locating during a same day
@@ -133,5 +100,3 @@ end
         
     end
 end
-
-
